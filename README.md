@@ -41,7 +41,7 @@ Before running Lyrify, ensure you have the following:
    - Click "Save."
 
 5. **Run the App:**
-   - Open the `Lyrify.gs` file in your Google Apps Script project.
+   - Open the `Execute.gs` file in your Google Apps Script project.
    - Click the play button to run the script.
    - Authorize the necessary permissions.
 
@@ -51,7 +51,7 @@ Before running Lyrify, ensure you have the following:
    - Open the Google Slides presentation where you want to add lyrics.
 
 2. **Run Lyrify:**
-   - In the Google Slides menu, click "Add-ons" -> "Lyrify" -> "Start."
+   - In the Google Slides menu, click "Add-ons" -> "Lyrify" -> "Lyrify"
    - Follow the prompts to fetch lyrics and add them to your slides.
 
 3. **Enjoy!**
