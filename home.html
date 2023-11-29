@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyrify</title>
+    <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700&display=swap">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        body {
+            font-family: Mukta, sans-serif;
+            color: #333; /* Dark grey text color */
+            background: linear-gradient(0deg, rgba(161,85,185,1) 0%, rgba(200,118,183,1) 62%, rgba(210,126,183,1) 73%, rgba(230,143,183,1) 82%, rgba(248,158,182,1) 95%, rgba(255,164,182,1) 100%);
+            overflow-y:scroll;
+            width: 100%;
+        }
+        .body::-webkit-scrollbar{
+          display: none;
+        }
+        h2{
+          font-family: Mukta, sans-serif;
+          color: #333;
+          font-weight: bold;
+        }
+        #header {
+            font-family: 'Prompt', sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            letter-spacing: 2px;
+            font-size: 30px;
+            color: #fff; /* White text color */
+        }
+        #google-slides {
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #googleSlidesForm {
+            background-color: #F9D1D1; 
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+
+        /* Black borders for text boxes */
+        #googleSlidesForm input,
+        #googleSlidesForm textarea {
+            border-radius: 10px; /* Rounded corners */
+        }
+
+        /* Pink button */
+        #googleSlidesForm button {
+            background-color: #F765A3;
+            color: #fff;
+        &:hover {
+        color: #fff;
+        background-color: #A155B9;
+        /* Add other styles for the hover state */
+          }
+
+      /* Active state */
+      &:active {
+        color: #fff;
+        background-color: #F9D1D1;
+        border: none;
+        /* Add other styles for the active state */
+          }
+        }
+
+        
+        /* Styling for the tabs and tab content */
+        .nav-tabs {
+            margin-bottom: 15px;
+        }
+
+        .nav-tabs .nav-item {
+            margin-bottom: -1px;
+        }
+
+        .tab-content {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        /* Styling for the table */
+        table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        img{
+          width: 50%;
+          height: auto;
+        }
+        /* Custom styles for active tab */
+        .nav-tabs .nav-item.active {
+            background-color: #A155B9; /* Purple color */
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #fff; /* White text color */
+        }
+
+    </style>
+</head>
+<body>
+  <div class="d-flex justify-content-center pt-4">
+  <img src="https://drive.google.com/uc?id=113YfbyyGCc81FaS-g_0paZsRO62ADO-0" class =""></img>
+  </div>
+    <!-- Google Slides Form -->
+    <!--add funcitonality to add and hide the success for the API -->
+    <section id="google-slides" class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center text-white">Create Slides</h2>
+                <form id="googleSlidesForm" class="shadow p-3 mb-5 rounded">
+                    <div class="form-group has-search shadow p-3 mb-5 rounded">
+                        <label class="font-weight-bold" for="title">Title of Song:</lable>
+                        <input type="search" class="form-control border-0" id="Title" placeholder="Song" required>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                    <button type="submit" class="btn w-100 shadow p-3 mb-5 rounded border-0" onclick="callServerFunction(event)" id="generate">Generate Slides</button>
+                    <div class="spinner-border spinner-border-lg d-none" role="status" id="loadingSpinner">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    </div>
+                </form>
+            </div> 
+        </div>
+        <div class="container mt-5 shadow p-0 mb-5 rounded" id= 'googleSlidesForm'>
+        <ul class="nav nav-tabs justify-content-center">
+            <li class="nav-item">
+                <button class="nav-link active" id="songTab googleSlidesForm" data-toggle="tab" href="#songTable">Recent Songs</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="suggestedTab" data-toggle="tab" href="#suggestedTable">Suggested Songs</button>
+            </li>
+        </ul>
+        <div class="justify-content-center tab-content">
+            <div class="tab-pane fade show active" id="songTable">
+                <table class="table-striped">
+                <tbody id="songTableBody"></tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade show active" id="suggestedTable">
+                <table class="table-striped">
+                <tbody id="suggestedTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </section>
+   <!-- Song Titles and Suggested Songs Tabs -->
+    <script>
+      function callServerFunction(event) {
+      event.preventDefault();
+      // Call the server-side function handleButtonClick
+      //removing the display property from the loadingSpinner to reveal the spinner
+      document.getElementById("generate").classList.add("d-none");
+      document.getElementById("loadingSpinner").classList.remove("d-none");      
+      var userInputValue = document.getElementById('Title').value;
+
+      //this is the for the loading spinner and the generate slides button when you press it.     
+      google.script.run.withSuccessHandler(function(response) {
+      if (response) {
+      // Hide the loading spinner after the server-side function is executed
+      document.getElementById("loadingSpinner").classList.add("d-none");
+      document.getElementById("generate").classList.remove("d-none");
+      populateSuggested(response)
+    }
+    google.script.run.withSuccessHandler()
+  }
+  ).handleButtonClick(userInputValue);
+}
+
+// function that calls the API with the suggested song. 
+  function callFunction(index) {
+    // Retrieve the title using the assigned index
+    var clickedTitleCell = document.getElementById('suggestedTitleCell_' + index);
+    var clickedTitle = clickedTitleCell.textContent;
+
+    // Call the createSlides function with the extracted title
+    google.script.run.handleButtonClick(clickedTitle);
+
+    // You can customize this function to perform a specific action
+    alert(clickedTitle + " loaded from the API!");
+}
+
+    function lyricsFromDB(index){
+      // Retrieve the title using the assigned index
+    var clickedTitleCell = document.getElementById('recentTitleCell_' + index);
+    var clickedTitle = clickedTitleCell.textContent;
+
+    // Call the createSlides function with the extracted title
+    google.script.run.readLyricsFromTable(clickedTitle);
+    }
+
+    function populateTable() {
+      google.script.run.withSuccessHandler(displayTitles).readFromTable();
+    }
+    function populateSuggested(id){
+      google.script.run.withSuccessHandler(displaySuggestedTitles).songRecommendation(id);
+    }
+
+    function displayTitles(titles) {
+      // Get the table body element by its ID
+      var tableBody = document.getElementById('songTableBody');
+
+      // Loop through each title in the 'titles' array
+      titles.forEach(function(title, index) {
+      // Create a new row for each title
+      var row = tableBody.insertRow();
+      // Create a cell for the title
+      var titleCell = row.insertCell(0);
+    
+      // Set the text content of the title cell to the current title
+      titleCell.textContent = title;
+      titleCell.id = 'recentTitleCell_' + index;
+      // Create a cell for the button
+      var buttonCell = row.insertCell(1);
+
+      // Create a new button element
+      var button = document.createElement('button');
+
+      // Set the text content of the button to something like 'Click me'
+      button.textContent = 'Generate';
+
+      // Add a Bootstrap class to the button for styling
+      button.className = 'btn btn-primary';
+      button.id = "suggested-btn";
+      // Add an event listener to the button for the 'click' event
+      button.addEventListener('click', function() {
+      // This function is executed when the button is clicked
+      // You can customize this function to perform a specific action
+      lyricsFromDB(index);
+      alert(title+ " loaded from database!")
+      });
+
+      // Append the button to the button cell
+      buttonCell.appendChild(button);
+      });
+    }
+
+    function displaySuggestedTitles(suggestedTitles) {
+    // Get the table body element by its ID
+    var tableBody = document.getElementById('suggestedTableBody');
+    tableBody.innerHTML = ''; // Clear existing content
+
+    // Log the received suggestedTitles for debugging
+    console.log('Received suggestedTitles:', suggestedTitles);
+
+    // Check if suggestedTitles is an array and not null
+    if (Array.isArray(suggestedTitles) && suggestedTitles.length > 0) {
+        // Loop through each suggested title in the 'suggestedTitles' array
+        suggestedTitles.forEach(function (title,index) {
+            // Create a new row for each title
+            var row = tableBody.insertRow();
+            // Create a cell for the title
+            var titleCell = row.insertCell(0);
+
+            // Set the text content of the title cell to the current title
+            titleCell.textContent = title.title; // Assuming 'title' is the property name
+            titleCell.id = 'suggestedTitleCell_' + index;
+            // Create a cell for the button
+            var buttonCell = row.insertCell(1);
+
+            // Create a new button element
+            var button = document.createElement('button');
+
+            // Set the text content of the button to something like 'Click me'
+            button.textContent = 'Generate';
+            
+            // Add a Bootstrap class to the button for styling
+            button.className = 'btn btn-primary';
+
+            // Add an event listener to the button for the 'click' event
+            button.addEventListener('click', function () {
+                // Call the function with the extracted title and index
+                callFunction(index);
+            });
+            // Append the button to the button cell
+            buttonCell.appendChild(button);
+        });
+    } else {
+        // Handle the case where suggestedTitles is not an array or is empty
+        console.error('Invalid suggestedTitles:', suggestedTitles);
+    }
+}
+    window.onload = function(){
+      populateTable()
+    };
+    </script>
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
